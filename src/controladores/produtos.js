@@ -1,16 +1,26 @@
-const conexao = require('../conexao');
 const { knex } = require('../conexao');
-const { cadastrarProdutoSchema, editarProdutoSchema } = require('../utils/validacoes/validacoes-produtos');
-const verificarProduto = require('../utils/verificar-produto');
+const { cadastrarProdutoSchema, atualizarProdutoSchema, atualizarImgProdutoSchema } = require('../utils/validacoes/validacoes-produtos');
+const consultarProduto = require('../utils/consultas/consultar-produto');
+const upload = require('../utils/storage/upload');
+const getPublicUrl = require('../utils/storage/getPublicUrl');
+const update = require('../utils/storage/update');
+const deleteImg = require('../utils/storage/delete');
 
 const listarProdutos = async (req, res) => {
     const { usuario } = req;
 
     try {
-        const query = await knex('produtos').where({ usuario_id: usuario.id, ...req.query }).orderBy('id').returning('*').debug()
+        const produtos = await knex('produtos').where({ usuario_id: usuario.id, ...req.query }).orderBy('id').returning('*').debug()
 
-        res.json(query)
+        for (let i = 0; i < produtos.length; i++) {
+            if (produtos[i].imagem) {
+                const { publicURL, error } = getPublicUrl(produtos[i].imagem)
+                if (error) return res.status(400).json(error.message);
+                produtos[i] = { ...produtos[i], url: publicURL }
+            }
+        }
 
+        res.json(produtos)
 
     } catch (error) {
         return res.status(400).json(error.message);
@@ -22,9 +32,14 @@ const obterProduto = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const produto = await verificarProduto(usuario.id, id)
+        let produto = await consultarProduto(usuario.id, id)
         if (!produto) return res.status(404).json('Produto não encontrado');
 
+        if (produto.imagem) {
+            const { publicURL, error } = getPublicUrl(produto.imagem)
+            if (error) return res.status(400).json(error.message);
+            produto = { ...produto, url: publicURL }
+        }
         return res.status(200).json(produto)
     } catch (error) {
         return res.status(400).json(error.message);
@@ -33,11 +48,22 @@ const obterProduto = async (req, res) => {
 
 const cadastrarProduto = async (req, res) => {
     const { usuario } = req;
+    const { nome_imagem, imagem, ...restBody } = req.body;
 
     try {
         await cadastrarProdutoSchema.validate(req.body)
+
+        if (nome_imagem && imagem) {
+            const { error } = await upload(nome_imagem, imagem)
+            if (error) return res.status(400).json(error.message)
+        }
+
         const insert = await knex('produtos')
-            .insert({ usuario_id: usuario.id, ...req.body })
+            .insert({
+                usuario_id: usuario.id,
+                imagem: nome_imagem,
+                ...restBody
+            })
             .returning(['*'])
             .debug()
 
@@ -52,15 +78,16 @@ const cadastrarProduto = async (req, res) => {
 const atualizarProduto = async (req, res) => {
     const { usuario } = req;
     const { id } = req.params;
-    const { nome, estoque, preco, categoria, descricao, imagem } = req.body;
+    const { nome, estoque, preco, categoria, descricao } = req.body;
 
-    if (!nome && !estoque && !preco && !categoria && !descricao && !imagem) {
+    if (!nome && !estoque && !preco && !categoria && !descricao) {
         return res.status(404).json('Informe ao menos um campo para atualizaçao do produto');
     }
 
     try {
-        await editarProdutoSchema.validate(req.body)
-        const produto = await verificarProduto(usuario.id, id)
+        await atualizarProdutoSchema.validate(req.body)
+
+        const produto = await consultarProduto(usuario.id, id)
         if (!produto) return res.status(404).json('Produto não encontrado');
 
         const att = await knex('produtos').update({ ...req.body }).where({ id, usuario_id: usuario.id }).returning('*').debug()
@@ -69,7 +96,7 @@ const atualizarProduto = async (req, res) => {
             return res.status(400).json("O produto não foi atualizado");
         }
 
-        return res.status(200).json('produto foi atualizado com sucesso.');
+        res.status(200).json('produto foi atualizado com sucesso.');
     } catch (error) {
         if (error.code === '42703') return res.status(400).json('Verifique se passou o nome da coluna corretamente.');
         return res.status(400).json(error.message);
@@ -81,8 +108,14 @@ const excluirProduto = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const produto = await verificarProduto(usuario.id, id)
+        const produto = await consultarProduto(usuario.id, id)
         if (!produto) return res.status(404).json('Produto não encontrado');
+
+        if (produto.imagem) {
+            const { error } = await deleteImg(produto.imagem)
+            if (error) return res.status(400).json(error.message)
+
+        }
 
         const produtoExcluido = await knex('produtos').delete().where({ id }).returning('*').debug()
         if (produtoExcluido.length === 0) {
@@ -95,10 +128,66 @@ const excluirProduto = async (req, res) => {
     }
 }
 
+const atualizarImgProduto = async (req, res) => {
+    const { usuario } = req;
+    const { id } = req.params;
+    const { nome_imagem, imagem } = req.body;
+
+    try {
+        await atualizarImgProdutoSchema.validate(req.body)
+
+        const produto = await consultarProduto(usuario.id, id)
+        if (!produto) return res.status(404).json('Produto não encontrado');
+
+        const { error } = await update(nome_imagem, imagem)
+        if (error) return res.status(400).json(error.message)
+
+        const att = await knex('produtos').update({ imagem: nome_imagem }).where({ id, usuario_id: usuario.id }).returning('*').debug()
+
+        if (att.length === 0) {
+            return res.status(400).json("A imagem do produto não foi atualizada");
+        }
+
+        res.status(200).json('A imagem do produto foi atualizada com sucesso.');
+
+    } catch (error) {
+        return res.status(400).json(error.message);
+    }
+}
+
+const excluirImgProduto = async (req, res) => {
+    const { usuario } = req;
+    const { id } = req.params;
+
+    try {
+
+        const produto = await consultarProduto(usuario.id, id)
+        if (!produto) return res.status(404).json('Produto não encontrado');
+
+        if (!produto.imagem) return res.status(400).json('Não há imagem para ser excluída');
+
+        const { error } = await deleteImg(produto.imagem)
+        if (error) return res.status(400).json(error.message)
+
+        const att = await knex('produtos').update({ imagem: null }).where({ id, usuario_id: usuario.id }).returning('*').debug()
+
+        if (att.length === 0) {
+            return res.status(400).json("A imagem do produto não foi excluída");
+        }
+
+        res.status(200).json('A imagem do produto foi excluída com sucesso.');
+
+    } catch (error) {
+        return res.status(400).json(error.message);
+    }
+}
+
 module.exports = {
     listarProdutos,
     obterProduto,
     cadastrarProduto,
     atualizarProduto,
-    excluirProduto
+    excluirProduto,
+    atualizarImgProduto,
+    excluirImgProduto
 }

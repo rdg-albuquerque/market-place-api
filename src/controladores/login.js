@@ -1,15 +1,14 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const senhaHash = require('../senhaHash');
 const loginSchema = require('../utils/validacoes/validacoes-login');
-const verificarUsuario = require('../utils/verificar-usuario');
+const consultarUsuário = require('../utils/consultas/consultar-usuario');
 
 const login = async (req, res) => {
     const { email, senha } = req.body;
 
     try {
         await loginSchema.validate(req.body)
-        const usuarios = await verificarUsuario(email)
+        const usuarios = await consultarUsuário(email)
         if (usuarios.length === 0) return res.status(400).json("Email e senha não confere")
 
         const usuario = usuarios[0]
@@ -20,7 +19,7 @@ const login = async (req, res) => {
             return res.status(400).json("Email e senha não confere");
         }
 
-        const token = jwt.sign({ id: usuario.id }, senhaHash, { expiresIn: '8h' });
+        const token = jwt.sign({ id: usuario.id }, process.env.JWT_SECRET, { expiresIn: '8h' });
 
         const { senha: _, ...dadosUsuario } = usuario;
 
