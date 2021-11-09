@@ -1,6 +1,5 @@
 const { knex } = require('../conexao');
 const jwt = require('jsonwebtoken');
-const senhaHash = require('../senhaHash');
 
 const verificaLogin = async (req, res, next) => {
     const { authorization } = req.headers;
@@ -12,7 +11,7 @@ const verificaLogin = async (req, res, next) => {
     try {
         const token = authorization.replace('Bearer ', '').trim();
 
-        const { id } = jwt.verify(token, senhaHash);
+        const { id } = jwt.verify(token, process.env.JWT_SECRET);
 
         const usuarios = await knex('usuarios').where({ id }).debug()
         if (usuarios.length === 0) return res.status(404).json('Usuario não encontrado');
