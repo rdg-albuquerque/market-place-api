@@ -2,9 +2,10 @@ const { knex } = require("../conexao");
 const bcrypt = require("bcrypt");
 const consultarUsuario = require("../utils/consultas/consultar-usuario");
 const { cadastrarUsuarioSchema, editarUsuarioSchema } = require("../utils/validacoes/validacoes-usuarios");
+const transporter = require("../nodemailer");
 
 const cadastrarUsuario = async (req, res) => {
-    const { email, senha } = req.body;
+    const { nome, email, senha } = req.body;
 
     try {
         await cadastrarUsuarioSchema.validate(req.body);
@@ -21,6 +22,16 @@ const cadastrarUsuario = async (req, res) => {
 
         if (!insert.length)
             return res.status(404).json("Não foi possível cadastrar o usuário");
+
+        transporter.sendMail({
+            from: '"Market Place" <nao-responder@marketplace.com>',
+            to: "bar@example.com",
+            subject: "Boas vindas",
+            template: 'cadastro',
+            context: {
+                nome
+            }
+        });
 
         return res.status(200).json("O usuario foi cadastrado com sucesso!");
     } catch (error) {

@@ -17,6 +17,8 @@
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.95.11",
+    "nodemailer": "^6.7.0",
+    "nodemailer-express-handlebars": "^4.0.0",
     "pg": "^8.6.0",
     "yup": "^0.32.11",
     "yup-locales": "^1.2.0"
