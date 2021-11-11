@@ -20,17 +20,16 @@ const cadastrarUsuario = async (req, res) => {
             .returning(["*"])
             .debug();
 
-        if (!insert.length)
-            return res.status(404).json("Não foi possível cadastrar o usuário");
+        if (!insert.length) return res.status(404).json("Não foi possível cadastrar o usuário");
 
         transporter.sendMail({
             from: '"Market Place" <nao-responder@marketplace.com>',
             to: "bar@example.com",
             subject: "Boas vindas",
-            template: 'cadastro',
+            template: "cadastro",
             context: {
-                nome
-            }
+                nome,
+            },
         });
 
         return res.status(200).json("O usuario foi cadastrado com sucesso!");
@@ -48,9 +47,7 @@ const atualizarPerfil = async (req, res) => {
     const { id } = req.usuario;
 
     if (!nome && !email && !senha && !nome_loja) {
-        return res
-            .status(404)
-            .json("É obrigatório informar ao menos um campo para atualização");
+        return res.status(404).json("É obrigatório informar ao menos um campo para atualização");
     }
 
     try {
@@ -67,14 +64,9 @@ const atualizarPerfil = async (req, res) => {
             dadosUpdate = { ...dadosUpdate, senha: senhaCriptografada };
         }
 
-        const att = await knex("usuarios")
-            .update(dadosUpdate)
-            .where({ id })
-            .returning(["*"])
-            .debug();
+        const att = await knex("usuarios").update(dadosUpdate).where({ id }).returning(["*"]).debug();
 
-        if (!att.length)
-            return res.status(404).json("Não foi possível atualizar o usuário");
+        if (!att.length) return res.status(404).json("Não foi possível atualizar o usuário");
 
         return res.status(200).json("Usuário foi atualizado com sucesso.");
     } catch (error) {

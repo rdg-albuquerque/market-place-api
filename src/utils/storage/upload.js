@@ -1,13 +1,10 @@
-const supabase = require("../../servicos/supabase")
+const supabase = require("../../servicos/supabase");
 
 async function upload(nome_imagem, imagem) {
-    const imgBuffer = Buffer.from(imagem, 'base64')
-    const response = await supabase
-        .storage
-        .from(process.env.STORAGE_BUCKET)
-        .upload(nome_imagem, imgBuffer)
+    const imgBuffer = Buffer.from(imagem, "base64");
+    const response = await supabase.storage.from(process.env.STORAGE_BUCKET).upload(nome_imagem, imgBuffer);
 
-    return response
+    return response;
 }
 
-module.exports = upload
+module.exports = upload;
