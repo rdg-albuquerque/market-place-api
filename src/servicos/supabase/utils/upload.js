@@ -1,4 +1,4 @@
-const supabase = require("../../servicos/supabase");
+const supabase = require("../supabase");
 
 async function upload(nome_imagem, imagem) {
     const imgBuffer = Buffer.from(imagem, "base64");
