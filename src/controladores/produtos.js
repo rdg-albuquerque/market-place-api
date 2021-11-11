@@ -5,10 +5,9 @@ const {
     atualizarImgProdutoSchema,
 } = require("../utils/validacoes/validacoes-produtos");
 const consultarProduto = require("../utils/consultas/consultar-produto");
-const upload = require("../utils/storage/upload");
-const getPublicUrl = require("../utils/storage/getPublicUrl");
-const update = require("../utils/storage/update");
-const deleteImg = require("../utils/storage/delete");
+const upload = require("../servicos/supabase/utils/upload");
+const deleteImg = require("../servicos/supabase/utils/delete");
+const getPublicUrl = require("../servicos/supabase/utils/getPublicUrl");
 
 const listarProdutos = async (req, res) => {
     const { usuario } = req;
