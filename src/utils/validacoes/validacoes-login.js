@@ -1,12 +1,11 @@
-const yup = require('yup')
-const { pt } = require('yup-locales')
+const yup = require("yup");
+const { pt } = require("yup-locales");
 
-yup.setLocale(pt)
-
+yup.setLocale(pt);
 
 const loginSchema = yup.object().shape({
     email: yup.string().email().required(),
-    senha: yup.string().required()
-})
+    senha: yup.string().required(),
+});
 
-module.exports = loginSchema
+module.exports = loginSchema;
