@@ -135,7 +135,7 @@ Exemplo do body JSON:
 }
 ```
 - Pelo menos 1 dessas propriedades deverá ser informada.
-
+---
 <b>[PUT] https://market-place-cubos.herokuapp.com/produto/🆔/img</b> 
 
 Deverá informar o ID do produto no PATH para adicionar/alterar a **imagem** do produto específico.
