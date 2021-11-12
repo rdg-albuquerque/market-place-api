@@ -2,7 +2,7 @@
 # API - Market place 🏪
 
 ## Resumo da API
-Rest API que fiz em um dos exercícios práticos no curso da Cubos Academy. Algumas das principais características:
+Rest API que fiz em um dos desafios no curso da Cubos Academy. Algumas das principais características:
 * CRUD de usuários e produtos com banco de dados relacional(PostgreSQL), utilizando query builder(knex).
 * Cadastro de usuários com criptografia de senha(bcrypt)
 * Login de autenticação e geração de token(jwt)
