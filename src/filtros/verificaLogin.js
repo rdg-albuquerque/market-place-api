@@ -21,7 +21,7 @@ const verificaLogin = async (req, res, next) => {
 
         next();
     } catch (error) {
-        return res.status(400).json("Não autorizado");
+        return res.status(401).json("Não autorizado");
     }
 };
 

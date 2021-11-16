@@ -66,7 +66,7 @@ const cadastrarProduto = async (req, res) => {
             .returning(["*"])
             .debug();
 
-        if (!insert.length) return res.status(404).json("Não foi possível cadastrar o produto");
+        if (!insert.length) return res.status(500).json("Não foi possível cadastrar o produto");
 
         return res.status(200).json("Produto cadastrado com sucesso");
     } catch (error) {
@@ -80,7 +80,7 @@ const atualizarProduto = async (req, res) => {
     const { nome, estoque, preco, categoria, descricao } = req.body;
 
     if (!nome && !estoque && !preco && !categoria && !descricao) {
-        return res.status(404).json("Informe ao menos um campo para atualizaçao do produto");
+        return res.status(400).json("Informe ao menos um campo para atualizaçao do produto");
     }
 
     try {
@@ -122,7 +122,7 @@ const excluirProduto = async (req, res) => {
 
         const produtoExcluido = await knex("produtos").delete().where({ id }).returning("*").debug();
         if (produtoExcluido.length === 0) {
-            return res.status(400).json("O produto não foi excluído");
+            return res.status(500).json("O produto não foi excluído");
         }
 
         return res.status(200).json("Produto excluido com sucesso");
@@ -136,6 +136,8 @@ const atualizarImgProduto = async (req, res) => {
     const { id } = req.params;
     const { nome_imagem, imagem } = req.body;
 
+    const pathImg = `${id}/${nome_imagem}`;
+
     try {
         await atualizarImgProdutoSchema.validate(req.body);
 
@@ -147,17 +149,17 @@ const atualizarImgProduto = async (req, res) => {
             if (error) return res.status(400).json(error.message);
         }
 
-        const { error } = await upload(nome_imagem, imagem);
+        const { error } = await upload(pathImg, imagem);
         if (error) return res.status(400).json(error.message);
 
         const att = await knex("produtos")
-            .update({ imagem: nome_imagem })
+            .update({ imagem: pathImg })
             .where({ id, usuario_id: usuario.id })
             .returning("*")
             .debug();
 
         if (att.length === 0) {
-            return res.status(400).json("A imagem do produto não foi atualizada");
+            return res.status(500).json("A imagem do produto não foi atualizada");
         }
 
         res.status(200).json("A imagem do produto foi atualizada com sucesso.");
@@ -186,7 +188,7 @@ const excluirImgProduto = async (req, res) => {
             .debug();
 
         if (att.length === 0) {
-            return res.status(400).json("A imagem do produto não foi excluída");
+            return res.status(500).json("A imagem do produto não foi excluída");
         }
 
         res.status(200).json("A imagem do produto foi excluída com sucesso.");
