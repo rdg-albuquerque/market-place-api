@@ -1,7 +1,7 @@
 const supabase = require("../supabase");
 
-async function deleteImg(nome_imagem) {
-    const response = await supabase.storage.from(process.env.STORAGE_BUCKET).remove([nome_imagem]);
+async function deleteImg(path) {
+    const response = await supabase.storage.from(process.env.STORAGE_BUCKET).remove([path]);
 
     return response;
 }
