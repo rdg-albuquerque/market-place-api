@@ -8,7 +8,7 @@
     "host": "market-place-cubos.herokuapp.com",
     "basePath": "/",
     "tags": [],
-    "schemes": ["http", "https"],
+    "schemes": ["https"],
     "consumes": [],
     "produces": [],
     "securityDefinitions": {
