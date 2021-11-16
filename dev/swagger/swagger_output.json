@@ -5,7 +5,7 @@
         "title": "Market place",
         "description": "Rest API - CRUD de usuários / produtos"
     },
-    "host": "market-place-cubos.herokuapp.com/",
+    "host": "market-place-cubos.herokuapp.com",
     "basePath": "/",
     "tags": [],
     "schemes": ["http", "https"],
