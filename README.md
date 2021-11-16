@@ -13,4 +13,4 @@ Rest API que fiz em um dos desafios no curso da Cubos Academy. Algumas das princ
 * Variáveis de ambiente para ocultamento de informações sensíveis.
 * Deployment e banco de dados na heroku.
 ### Quer consumir a API ? Fique a vontade para testar ! 👇
-<a href="https://market-place-cubos.herokuapp.com/docs/" target="_blank">Documentação swagger</a>
+[Documentação swagger](https://market-place-cubos.herokuapp.com/docs/)
