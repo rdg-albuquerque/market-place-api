@@ -1,6 +1,9 @@
 
 # API - Market place 🏪
 
+## Quer consumir a API ? Fique a vontade para testar ! 👇
+### [Documentação swagger](https://market-place-cubos.herokuapp.com/docs/)
+
 ## Resumo da API
 Rest API que fiz em um dos desafios no curso da Cubos Academy. Algumas das principais características:
 * CRUD de usuários e produtos com banco de dados relacional(PostgreSQL), utilizando query builder(knex).
@@ -12,5 +15,3 @@ Rest API que fiz em um dos desafios no curso da Cubos Academy. Algumas das princ
 * Envio de e-mail no ato de cadastro de novos usuários com template .handlebars
 * Variáveis de ambiente para ocultamento de informações sensíveis.
 * Deployment e banco de dados na heroku.
-### Quer consumir a API ? Fique a vontade para testar ! 👇
-[Documentação swagger](https://market-place-cubos.herokuapp.com/docs/)
